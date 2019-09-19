@@ -1,5 +1,3 @@
-# PARCIAL WEB 2019-2
+# Proyecto loco
 
-## jsgr
-
-Licencia: MPL 2.0
+## Stegonomono
