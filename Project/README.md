@@ -1,5 +1,3 @@
 # Proyecto loco
 
 ## Stegonomono
-
-lol
