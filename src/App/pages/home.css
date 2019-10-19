@@ -1,27 +1,35 @@
-
-
-body{
-	background-color: #9DBFFC;
+body {
+  background-color: rgb(187, 201, 238);
 }
 
 .header {
   text-align: center;
   padding: 20px;
-  background-color: #5F7CB0;
+  background-color: #5f7cb0;
 }
 
-.texto{
-	align-content: center;
-	text-align: center;
-	width: 50%;
-	margin-left: 25%;
+.texto {
+  align-content: center;
+  text-align: center;
+  width: 50%;
+  margin-left: 25%;
 }
-.boton
-{
-	align-content: center;
-	text-align: center;
-	width: 50%;
-	margin-left: 25%;
+.boton {
+  align-content: center;
+  text-align: center;
+  width: 50%;
+  margin-left: 25%;
+}
+
+.login {
+  text-align: center;
+  background-color: #5f7cb0;
+  border-radius: 8px;
+  width: 295px;
+  padding: 25px 32px;
+  margin-top: 170px;
+  border-style: solid;
+  border-color: #5f7cb0;
 }
 
 #chartdiv {
