@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { Component } from 'react';
+import './home.css';
+import Chart from './pieChart';
+import './home.css';
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
+import { Route, Switch } from 'react-router-dom';
+import Home from './Home';
 
 function Copyright() {
   return (
@@ -52,6 +56,9 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(6),
   },
+  headerTeT: {
+    padding: theme.spacing(2, 10, 2),
+  },
 }));
 
 export default function Album() {
@@ -62,9 +69,21 @@ export default function Album() {
       <CssBaseline />
       <AppBar position="relative">
         <Toolbar>
-          <Typography variant="h6" color="inherit" noWrap>
-            Stegonomono
-          </Typography>
+          <div className={classes.headerTeT}>
+            <Typography variant="h6" color="inherit" noWrap>
+              Stegonomono
+            </Typography>
+          </div>
+          <form action="/Home">
+            <Button
+              color="inherit"
+              onClick={() => {
+                console.log('onClick');
+              }}
+            >
+              Return to Main
+            </Button>
+          </form>
         </Toolbar>
       </AppBar>
       <main>
@@ -86,42 +105,10 @@ export default function Album() {
               color="textSecondary"
               paragraph
             >
-              Bienvenido a STEGONOMONO. Esta herramienta permite detectar
-              imágenes, que hallan sido alteradas usando esteganografía. Adjunte
-              la imagen que desea escanear y presione el botón de Enviar para
-              empezar el análisis.
+              <h1>RIESGO: ALTO</h1>
             </Typography>
-            <div className={classes.heroButtons}>
-              <Grid container spacing={2} justify="center">
-                <Grid item>
-                  <input
-                    accept="image/*"
-                    className={classes.input}
-                    id="contained-button-file"
-                    multiple
-                    type="file"
-                  />
-
-                  <label htmlFor="contained-button-file">
-                    <Button
-                      variant="outlined"
-                      component="span"
-                      className={classes.button}
-                      color="primary"
-                    >
-                      Upload
-                    </Button>
-                  </label>
-                </Grid>
-
-                <Grid item>
-                  <form action="/reportes">
-                    <Button variant="contained" color="primary">
-                      Submit
-                    </Button>
-                  </form>
-                </Grid>
-              </Grid>
+            <div>
+              <Chart />
             </div>
           </Container>
         </div>
