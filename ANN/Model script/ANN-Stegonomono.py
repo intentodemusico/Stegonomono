@@ -285,7 +285,7 @@ test_dataset = tf.data.experimental.make_csv_dataset(
     test_fp,
     batch_size,
     column_names=column_names,
-    label_name='species',
+    label_name=label_name,
     num_epochs=1,
     shuffle=False)
 
