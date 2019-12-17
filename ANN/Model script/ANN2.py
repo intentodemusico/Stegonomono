@@ -1,9 +1,16 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Nov 20 21:51:50 2019
+
+@author: INTENTODEMUSICO
+"""
+
 #!/usr/bin/env python
 # coding: utf-8
 
 # ## Librerías
 
-# In[ ]:
+# In[1]:
 
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -14,26 +21,26 @@ import matplotlib.pyplot as plt
 
 # Descomentar para correr con gugol colab
 
-# In[ ]:
+# In[2]:
 
 
 #%tensorflow_version 2.x
 
 
-# In[ ]:
+# In[3]:
 
 
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
 
-# In[ ]:
+# In[4]:
 
 
 import tensorflow as tf
 
 
-# In[ ]:
+# In[5]:
 
 
 print("TensorFlow version: {}".format(tf.__version__))
@@ -42,7 +49,7 @@ print("Eager execution: {}".format(tf.executing_eagerly()))
 
 # Dataset
 
-# In[ ]:
+# In[6]:
 
 
 train_dataset_url = "https://raw.githubusercontent.com/intentodemusico/Stegonomono/master/ANN/Dataset/train_70000.csv"
@@ -52,7 +59,7 @@ train_dataset_fp = tf.keras.utils.get_file(fname=os.path.basename(train_dataset_
 print("Local copy of the dataset file: {}".format(train_dataset_fp))
 
 
-# In[ ]:
+# In[7]:
 
 
 # column order in CSV file
@@ -65,13 +72,13 @@ print("Features: {}".format(feature_names))
 print("Label: {}".format(label_name))
 
 
-# In[ ]:
+# In[8]:
 
 
-class_names = ['Positive','Negative']
+class_names = [0,1]
 
 
-# In[ ]:
+# In[9]:
 
 
 batch_size = 64
@@ -84,7 +91,7 @@ train_dataset = tf.data.experimental.make_csv_dataset(
     num_epochs=250)
 
 
-# In[ ]:
+# In[10]:
 
 
 features, labels= next(iter(train_dataset))
@@ -92,13 +99,13 @@ features['Range']=tf.dtypes.cast(features['Range'], tf.float32)
 labels=tf.dtypes.cast(labels, tf.float32)
 
 
-# In[ ]:
+# In[11]:
 
 
 print(labels)
 
 
-# In[ ]:
+# In[12]:
 
 
 def pack_features_vector(features, labels):
@@ -109,13 +116,13 @@ def pack_features_vector(features, labels):
   return features, labels
 
 
-# In[ ]:
+# In[13]:
 
 
 train_dataset = train_dataset.map(pack_features_vector)
 
 
-# In[ ]:
+# In[14]:
 
 
 features, labels = next(iter(train_dataset))
@@ -124,7 +131,7 @@ features, labels = next(iter(train_dataset))
 #print("\n" ,labels)
 
 
-# In[ ]:
+# In[15]:
 
 
 labels=tf.dtypes.cast(labels, tf.float32)#Machetazo supremo
@@ -135,7 +142,7 @@ print(labels)
 
 # ## Modelling
 
-# In[ ]:
+# In[16]:
 
 
 model = tf.keras.Sequential([
@@ -146,20 +153,20 @@ model = tf.keras.Sequential([
 ])
 
 
-# In[ ]:
+# In[17]:
 
 
 #predictions = model(features)
 #predictions[:5]
 
 
-# In[ ]:
+# In[18]:
 
 
 #tf.nn.softmax(predictions[:5])
 
 
-# In[ ]:
+# In[19]:
 
 
 #print("Prediction: {}".format(tf.argmax(predictions, axis=1)))
@@ -168,7 +175,7 @@ model = tf.keras.Sequential([
 
 # ## Training
 
-# In[ ]:
+# In[20]:
 
 
 
@@ -177,7 +184,7 @@ model = tf.keras.Sequential([
   #            metrics=['accuracy'])
 
 
-# In[ ]:
+# In[21]:
 
 
 #loss_object = tf.keras.losses.binary_crossentropy(from_logits=True)
@@ -185,11 +192,11 @@ model = tf.keras.Sequential([
 
 # ## Aquí podría hacer el reshape para evitar el error...
 
-# In[ ]:
+# In[22]:
 
 
 def loss(model, x, y):
-  y_ = tf.reshape(model(x),(64,))
+  #y_ = tf.reshape(model(x),(64,)) #Wtf acá
   y_=model(x)#print(y)
   return tf.keras.losses.binary_crossentropy(from_logits=True,y_true=y, y_pred=y_)
 
@@ -199,24 +206,24 @@ l = loss(model, features, labels)
 print("Loss test: {}".format(l))
 
 
-# In[ ]:
+# In[23]:
 
 
 def grad(model, inputs, targets):
-  targets=tf.reshape(targets,(64,1))
+  targets=tf.reshape(targets,(int(targets.get_shape().as_list()[0]),1))
   with tf.GradientTape() as tape:
     loss_value = loss(model, inputs, targets)
   return loss_value, tape.gradient(loss_value, model.trainable_variables)
 
 
-# In[ ]:
+# In[24]:
 
 
 optimizer = tf.keras.optimizers.Adam(learning_rate=0.01) #Optimization function
 #print(labels)
 
 
-# In[ ]:
+# In[25]:
 
 
 ## Note: Rerunning this cell uses the same model variables
@@ -235,16 +242,19 @@ for epoch in range(num_epochs):
   # Training loop - using batches of 64
   for x, y in train_dataset:
     # Optimize the model
+    #print("x:",x,"y:",y,"\n")
     loss_value, grads = grad(model, x, y)
     optimizer.apply_gradients(zip(grads, model.trainable_variables))
 
     # Track progress
     epoch_loss_avg(loss_value)  # Add current batch loss
     # Compare predicted label to actual label
-    y=tf.reshape(y,(64,1))
+    y=tf.reshape(y,(int(y.get_shape().as_list()[0]),1))
     epoch_accuracy(y, model(x))
+    
 
   # End epoch
+  print("Fin epoch")
   train_loss_results.append(epoch_loss_avg.result())
   train_accuracy_results.append(epoch_accuracy.result())
 
@@ -285,7 +295,7 @@ test_dataset = tf.data.experimental.make_csv_dataset(
     test_fp,
     batch_size,
     column_names=column_names,
-    label_name=label_name,
+    label_name='species',
     num_epochs=1,
     shuffle=False)
 
@@ -306,7 +316,6 @@ print("Test set accuracy: {:.3%}".format(test_accuracy.result()))
 
 
 # In[ ]:
-
 
 
 #tf.stack([y,prediction],axis=1)
