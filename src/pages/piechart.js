@@ -4,7 +4,7 @@ import { MDBContainer } from 'mdbreact';
 import Risk from './Risk';
 import Typography from '@material-ui/core/Typography';
 
-const inseguro = localStorage.result
+const inseguro = localStorage.resulto
 const seguro = 100 - inseguro;
 
 class PieChart extends React.Component {
