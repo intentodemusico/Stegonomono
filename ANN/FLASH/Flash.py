@@ -1,18 +1,26 @@
-#!/usr/bin/python
-from flask import Flask, escape, url_for
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Dec 17 14:10:02 2019
 
-app = Flask(__name__)
+@author: INTENTODEMUSICO
+"""
+#!/usr/bin/python
+from flask import request, url_for
+from flask_api import FlaskAPI, status, exceptions
+
+app = FlaskAPI(__name__)
 @app.route("/")
 def index():
-    return "/API/image/upload para subir\n/API/image/result para el resultado"
+    return "/API/image/ para subir mediante un post -> el resultado se entregará en la cabecera de respuesta"
 
-@app.route("/API/image/result", methods=['GET', 'POST', 'PUT'])
+@app.route("/API/image/", methods=['GET', 'POST', 'PUT'])
 def result():
-    return "El número de Germán TEST"
-
-@app.route("/API/image/upload", methods=['GET', 'POST', 'PUT'])
-def upload():
-    return "Suba su imagen pls"
-
+    if request.method == 'GET':
+        return "Perro, debe usar POST"
+    if request.method == "POST":
+        test = str(request.data.get('test', ''))
+        print("aaa",test)
+        test+="El angarita resultado"
+        return (test,"200")
+    return("Holi")
 app.run(host="0.0.0.0", port=2012)
-
