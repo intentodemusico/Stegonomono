@@ -73,12 +73,14 @@ export default class Album extends Component {
     event.preventDefault()
   }
   sendImage() {
-    var values = {
-      "image": this.state.image
-    }
 
-    Axios.post('http://localhost:3000/putData', values).then(res => {
+    var formData= new FormData();
+    formData.append("image",this.state.image)
+
+
+    Axios.post('http://stegonomono.bucaramanga.upb.edu.co/API/image/',formData,{"Content-Type": "multipart/form-data"}).then(res => {
       console.log(res);
+      localStorage.setItem("resulto",res.result)
       window.location = "/reportes"
 
     }).catch(err => {
