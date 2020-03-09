@@ -1,12 +1,16 @@
 #!/usr/bin/python
 #%% Libraries
 from __future__ import absolute_import, division, print_function, unicode_literals
-import os
+import os, cv2
 from datetime import datetime
-import cv2
+import pandas as pd
 import tensorflow as tf
 import scipy.stats as sts
-import pyrem as pr
+import univariate as univariate
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+from scipy.stats.mstats import gmean
+from pandas import DataFrame
 print("TensorFlow version: {}".format(tf.__version__))
 print("Eager execution: {}".format(tf.executing_eagerly()))
 
@@ -23,26 +27,22 @@ print("modelo importado")
 
 
 #%%
-def geo_mean(iterable):
-    a = np.array(iterable)
-    return a.prod()**(1.0/len(a))
-
 def pred(csvName):
-    input_dataset_url = csvName
-    inputDataset = pd.read_csv(input_dataset_url)
-    X_input = inputDataset.iloc[:,:-1].values
-    
-    #%% Feature Scaling
-    from sklearn.preprocessing import StandardScaler
+    dataset = pd.read_csv(csvName)
+    X = dataset.iloc[:, :].values
     sc = StandardScaler()
-    X_Input = sc.transform(X_Input)
+    X = np.transpose(sc.fit_transform(X))
     
     #%%
-    return model.predict(X_input)
-    print("Resultado arrojado")
+    return model.predict(X)[0][0]
+    print("Resultado obtenido")
 
 #%%
+def hjorth_params(trace):
+    return univariate.hjorth(trace)
 
+save_path='./csv'
+#%%
 app = FlaskAPI(__name__)
 cors = CORS(app)
 
@@ -56,15 +56,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route("/")
 def index():
-    return "If you're using this API through the 80 port, you're on testing, lmao -> /API/image/ para subir mediante un post -> el resultado se entregará en la cabecera de respuesta"
-
-@app.route("/reset")
-def reset():
-    global elemento, x
-
-    elemento=-1
-    random.shuffle(x)
-    return "reinicia2"
+    return "If you're using this API through the 80 port, you're on testing -> /API/image/ para subir mediante un post -> el resultado se entregará en la cabecera de respuesta"
 
 @app.route("/API/image/", methods=['GET', 'POST'])
 @cross_origin()
@@ -82,9 +74,9 @@ def result():
         #if not mimetype in valid_mimetypes:
         #    return jsonify({'error': 'bad-type'}),406
         # Write image to static directory
-        print("Ola")
-        img_file.save(os.path.join(app.config['UPLOAD_FOLDER'], img_name))
-        imgLocation="UPLOAD_FOLDER/"+img_name
+        imgLocation=os.path.join("./UPLOAD_FOLDER", img_name)
+        img_file.save(imgLocation)
+        
         img = cv2.imread(imgLocation,0)
         
 
@@ -94,11 +86,13 @@ def result():
         #Else 
         #Gray scale
         
+        trace=hist.reshape(256)
+        gTrace=trace[trace!=0]
         
         #Getting atributes
         atributes=np.zeros(8)
         
-        #Kurtosis
+        #Kurtosis 
         atributes[0]=sts.kurtosis(hist)
         #Skewness
         atributes[1]=sts.skew(hist)
@@ -109,28 +103,32 @@ def result():
         #Median 
         atributes[4]=np.median(hist)
         #Geometric_Mean 
-        atributes[5]=geo_mean(hist)
+        atributes[5]=gmean(gTrace)
         #Hjorth
-        x,comp, mor= pr.univariate.hjorth(hist)
+        a,mor, comp= hjorth_params(trace)
         #Mobility 
         atributes[6]=mor
         #Complexity
         atributes[7]=comp
         
+        
         ##Saving image atributes in csv -> guardo nombre con timestamp en csv/$csvName
-        ##If 1 -> save csv with timestamp
-        csvName=str(datetime.now()).split(" ")[0]+"_"+str(datetime.now()).split(" ")[1]+".csv"
-        saveCsv="csv/"+csvName
-        numpy.savetxt(saveCsv,atributes, delimeter=",")
-        result= pred(saveCsv)
+        csvName=str(datetime.now()).split(" ")[0]+"_"+str(datetime.now()).split(" ")[1].split(".")[0]+".csv"
+        
+        #saveCsv="csv/"+str(csvName)
+        csvName=img_name[:-4]+csvName.replace(":","-")
+        completeName = os.path.join(save_path, csvName)        
+        np.savetxt(completeName,atributes, delimiter=",")
+        
+        result= pred(completeName)
         #result=random.uniform(0,1) 
-        data={'result': result} 
+        data={'result': str(result)} 
         
         # Delete image when done with analysis
-        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], img_name))
+        os.remove(imgLocation)
        
         return jsonify(data), 200 #if no hay error, else jaja
-    return("ERROR: Holi, debe utilizar POST con su imagen y leer la respuesta, jajasalu2","400")
+    return("ERROR: Hola, debe utilizar POST con su imagen y leer la respuesta","400")
 
 #%%
 #OJO, SOLO PARA PRUEBAS ES EL PUERTO 80
