@@ -47,23 +47,23 @@ for i in range(1,11):
     atributes=np.zeros(8)
     
     #Kurtosis 
-    atributes[0]=sts.kurtosis(hist)
+    atributes[0]='%.7f'%sts.kurtosis(hist)
     #Skewness
-    atributes[1]=sts.skew(hist)
+    atributes[1]='%.7f'%sts.skew(hist)
     #Std
-    atributes[2]=np.std(hist)
+    atributes[2]='%.7f'%np.std(hist)
     #Range
-    atributes[3]=np.ptp(hist)
+    atributes[3]='%.7f'%np.ptp(hist)
     #Median 
-    atributes[4]=np.median(hist)
+    atributes[4]='%.7f'%np.median(hist)
     #Geometric_Mean 
-    atributes[5]=gmean(gTrace)
+    atributes[5]='%.7f'%gmean(gTrace)
     #Hjorth
     a,mor, comp= hjorth_params(trace)
     #Mobility 
-    atributes[6]=mor
+    atributes[6]='%.7f'%mor
     #Complexity
-    atributes[7]=comp
+    atributes[7]='%.7f'%comp
 
     ##Saving image atributes in csv -> guardo nombre con timestamp en csv/$csvName
     csvName=str(datetime.now()).split(" ")[0]+"_"+str(datetime.now()).split(" ")[1].split(".")[0]+".csv"
