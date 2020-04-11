@@ -71,7 +71,7 @@ def attributes(location,kind):
 x=np.zeros(10)
 test=np.zeros(10,dtype='<U256')#.astype(object)#,headers=['Kurtosis', 'Skewness', 'Std', 'Range', 'Median', 'Geometric_Mean', 'Mobility', 'Complexity','IsStego','Location'])
 train=np.zeros(10,dtype='<U256')#.astype(object)#,headers=['Kurtosis', 'Skewness', 'Std', 'Range', 'Median', 'Geometric_Mean', 'Mobility', 'Complexity','IsStego','Location'])
-print(np.shape(test))
+#print(np.shape(test))
 steg="train_steg_0."
 carr="train_carr"
 
