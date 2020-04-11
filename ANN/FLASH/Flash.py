@@ -18,7 +18,6 @@ print("Eager execution: {}".format(tf.executing_eagerly()))
 from flask import request, url_for, jsonify
 from flask_api import FlaskAPI, status, exceptions
 from flask_cors import CORS, cross_origin
-import random
 
 #%% Importing model
 from tensorflow import keras

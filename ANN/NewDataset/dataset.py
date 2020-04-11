@@ -38,36 +38,40 @@ def attributes(location,kind):
     #gTrace=trace[trace>0]
     
     #Getting atributes
-    attributes=np.zeros(9,dtype=np.float_)
+    attributes=np.zeros(10,dtype='<U256')#.astype(object)
     
     #Kurtosis 
-    attributes[0]=e(sts.kurtosis(trace))
+    attributes[0]=str(sts.kurtosis(trace))
     #Skewness
-    attributes[1]=e(sts.skew(trace))
+    attributes[1]=str(sts.skew(trace))
     #Std
-    attributes[2]=e(np.std(trace))
+    attributes[2]=str(np.std(trace))
     #Range
-    attributes[3]=e(np.ptp(trace))
+    attributes[3]=str(np.ptp(trace))
     #Median 
-    attributes[4]=e(np.median(trace))
+    attributes[4]=str(np.median(trace))
     #Geometric_Mean 
-    attributes[5]=gmean(trace)
+    attributes[5]=str(gmean(trace))
     #Hjorth
     a,mor, comp= hjorth_params(trace)
     #Mobility 
-    attributes[6]=mor
+    attributes[6]=str(mor)
     #Complexity
-    attributes[7]=comp
-    attributes[8]=kind
+    attributes[7]=str(comp)
+    attributes[8]=str(kind)
+    
+    attributes[9]=str(location)
+    #print(attributes)
     if(str(comp)=='nan' or str(mor)=='nan' or str(attributes[5])=="nan"):
         a=np.array((location,str(attributes[5]),mor,comp))
         fallas=np.vstack((fallas,a))
         fail+=1
     return attributes
 #%%
-test=np.zeros(9,dtype=np.float_)
-train=np.zeros(9,dtype=np.float_)
-
+x=np.zeros(10)
+test=np.zeros(10,dtype='<U256')#.astype(object)#,headers=['Kurtosis', 'Skewness', 'Std', 'Range', 'Median', 'Geometric_Mean', 'Mobility', 'Complexity','IsStego','Location'])
+train=np.zeros(10,dtype='<U256')#.astype(object)#,headers=['Kurtosis', 'Skewness', 'Std', 'Range', 'Median', 'Geometric_Mean', 'Mobility', 'Complexity','IsStego','Location'])
+print(np.shape(test))
 steg="train_steg_0."
 carr="train_carr"
 
@@ -124,13 +128,13 @@ for i in range(1,501):
     test=np.vstack((test,aTest))
 
 #%%    
+print(fail)
 test=np.delete(test,0,0)
 train=np.delete(train,0,0)
 path='./Final'
 pTrain=os.path.join(path,"train_5000.csv")
 pTest=os.path.join(path,"test_5000.csv")
-np.savetxt(pTrain,train, delimiter=",")
-np.savetxt(pTest,test, delimiter=",")
+np.savetxt(pTrain,train, delimiter=",", fmt="%s")
+np.savetxt(pTest,test, delimiter=",", fmt="%s")
 asd="fallas.csv"
 np.savetxt(asd,fallas,delimiter=",", fmt="%s")
-print(fail)
