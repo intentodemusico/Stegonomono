@@ -33,7 +33,7 @@ def attributes(location,kind):
     #Gray scale
     
     trace=hist.reshape(256)
-    trace[trace!=-10000]+=1
+    #trace[trace!=-10000]+=1
     
     #gTrace=trace[trace>0]
     

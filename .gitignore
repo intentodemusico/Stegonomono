@@ -62,3 +62,4 @@ typings/
 
 ANN/NewDataset/Training
 ANN/NewDataset/Testing
+ANN/FLASH/csv

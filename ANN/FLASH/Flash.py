@@ -27,18 +27,56 @@ print("modelo importado")
 
 #%%
 def pred(csvName):
-    dataset = pd.read_csv(csvName)
-    X = dataset.iloc[:, :].values
+    dataset = pd.read_csv(csvName, header=None)
+    X = dataset.iloc[:].values
     sc = StandardScaler()
     X = np.transpose(sc.fit_transform(X))
-    
     #%%
-    return model.predict(X)[0][0]
+    res=model.predict(X)
     print("Resultado obtenido")
+    print(res,res>0.1)
+    return 1
+    
 
 #%%
 def hjorth_params(trace):
     return univariate.hjorth(trace)
+
+def attributes(location):
+    img = cv2.imread(location,0)
+      
+    #Preprocessing
+    #If image is monochromatic
+    hist = cv2.calcHist([img],[0],None,[256],[0,256])
+    #Else 
+    #Gray scale
+    
+    trace=hist.reshape(256)
+    
+    #gTrace=trace[trace>0]
+    
+    #Getting atributes
+    attributes=np.zeros(8)#.astype(object)
+    
+    #Kurtosis 
+    attributes[0]=str(sts.kurtosis(trace))
+    #Skewness
+    attributes[1]=str(sts.skew(trace))
+    #Std
+    attributes[2]=str(np.std(trace))
+    #Range
+    attributes[3]=str(np.ptp(trace))
+    #Median 
+    attributes[4]=str(np.median(trace))
+    #Geometric_Mean 
+    attributes[5]=str(gmean(trace))
+    #Hjorth
+    a,mor, comp= hjorth_params(trace)
+    #Mobility 
+    attributes[6]=str(mor)
+    #Complexity
+    attributes[7]=str(comp)
+    return attributes
 
 save_path='./csv'
 #%%
@@ -76,40 +114,7 @@ def result():
         imgLocation=os.path.join("./UPLOAD_FOLDER", img_name)
         img_file.save(imgLocation)
         
-        img = cv2.imread(imgLocation,0)
-        
-
-        #Preprocessing
-        #If image is monochromatic
-        hist = cv2.calcHist([img],[0],None,[256],[0,256])
-        #Else 
-        #Gray scale
-        
-        trace=hist.reshape(256)
-        gTrace=trace[trace!=0]
-        
-        #Getting atributes
-        atributes=np.zeros(8)
-        
-        #Kurtosis 
-        atributes[0]=sts.kurtosis(hist)
-        #Skewness
-        atributes[1]=sts.skew(hist)
-        #Std
-        atributes[2]=np.std(hist)
-        #Range
-        atributes[3]=np.ptp(hist)
-        #Median 
-        atributes[4]=np.median(hist)
-        #Geometric_Mean 
-        atributes[5]=gmean(gTrace)
-        #Hjorth
-        a,mor, comp= hjorth_params(trace)
-        #Mobility 
-        atributes[6]=mor
-        #Complexity
-        atributes[7]=comp
-        
+        attr=attributes(imgLocation)
         
         ##Saving image atributes in csv -> guardo nombre con timestamp en csv/$csvName
         csvName=str(datetime.now()).split(" ")[0]+"_"+str(datetime.now()).split(" ")[1].split(".")[0]+".csv"
@@ -117,8 +122,7 @@ def result():
         #saveCsv="csv/"+str(csvName)
         csvName=img_name[:-4]+csvName.replace(":","-")
         completeName = os.path.join(save_path, csvName)        
-        np.savetxt(completeName,atributes, delimiter=",")
-        
+        np.savetxt(completeName,attr, delimiter=",")
         result= pred(completeName)
         #result=random.uniform(0,1) 
         data={'result': str(result)} 
