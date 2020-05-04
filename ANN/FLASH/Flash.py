@@ -35,7 +35,7 @@ def pred(csvName):
     res=model.predict(X)
     print("Resultado obtenido")
     print(res,res>0.1)
-    return 1
+    return res
     
 
 #%%
